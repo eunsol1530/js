@@ -20,7 +20,18 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 app.use(express.urlencoded({ extended: true}));
-app.use(session({ secret: 'notagoodsecret' }))
+app.use(session({ 
+    secret: process.env.SESSION_SECRET || 'fallbacksecret', 
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false, // Set to true if using HTTPS
+        maxAge: 60000, // Example expiration time (1 minute)
+        path: '/',
+        domain: 'localhost' // Adjust as necessary
+    }
+}))
 
 const requireLogin = (req, res, next) => {
     if(!req.session.user_id) {
@@ -93,4 +104,3 @@ app.get('/topsecret', requireLogin, (req, res) => {
 app.listen(3000, () => { //nodemon(서버 열기)
     console.log("서버 접속 완료!!!")
 })
-
